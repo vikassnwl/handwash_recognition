@@ -7,7 +7,8 @@ save_directory = "uploaded_videos"
 os.makedirs(save_directory, exist_ok=True)  # Create the directory if it doesn't exist
 
 # Streamlit UI
-st.title("Upload a Video and Save to Directory")
+# st.title("Upload a Video and Save to Directory")
+st.title("Upload a Video")
 
 # File uploader widget for video files
 uploaded_file = st.file_uploader("Choose a video file", type=["mp4", "avi", "mov"])
