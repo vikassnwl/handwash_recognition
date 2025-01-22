@@ -1,3 +1,4 @@
-env
-model
-uploaded_videos
+env/
+model/
+uploaded_videos/
+models/
