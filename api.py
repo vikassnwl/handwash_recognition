@@ -11,7 +11,7 @@ CORS(app)
 def load_model():
     print("Loading the model...")
     global model
-    model = tf.keras.models.load_model("model/downloaded_model.keras")
+    model = tf.keras.models.load_model("models/downloaded_model.keras")
     print("model loaded successfully!")
 
 load_model()

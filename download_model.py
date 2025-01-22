@@ -5,7 +5,7 @@ import gdown
 file_id = "1cwbLBiDToAJimYm83rnRNHuinK9PypO1"  # Replace with your Google Drive file ID
 
 # Create the model directory if it doesn't exist
-model_dir = "model"
+model_dir = "models"
 os.makedirs(model_dir, exist_ok=True)
 
 # Construct the download URL
