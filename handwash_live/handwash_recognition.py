@@ -1,16 +1,9 @@
 import cv2
-import mediapipe as mp
 import numpy as np
 import tensorflow as tf
 import threading
 import queue
-import pyttsx3
-import time
 
-
-# Speech Engine
-engine = pyttsx3.init()
-engine.setProperty("rate", 150)
 
 labels_dict = {
     0: "Rub both wrists in rotating manner",
@@ -47,23 +40,8 @@ threading.Thread(
     target=predict_frame, args=(handwash_model, frame_queue, result_queue), daemon=True
 ).start()
 
-# Mediapipe setup
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(
-    static_image_mode=False, max_num_hands=2, min_detection_confidence=0.5
-)
-mp_draw = mp.solutions.drawing_utils
-
-# Parameters for hand detection timeout
-HAND_DETECTION_TIMEOUT = 5  # seconds
-last_hand_detected_time = None
-
 # Initialize video capture
-# cap = cv2.VideoCapture('http://192.168.43.130:4747/video')
-# cap = cv2.VideoCapture('http://192.168.43.135:4747/video')
-# cap = cv2.VideoCapture(0)
-cap = cv2.VideoCapture("handwash_live/sample_videos/recorded videos/VID_20250117_132117.mp4")
-
+cap = cv2.VideoCapture(0)
 
 # Helper function to preprocess frame for the CNN model
 def preprocess_frame(frame):
@@ -76,9 +54,6 @@ def preprocess_frame(frame):
 # Variables
 predicted_class = "initial text1"
 predicted_conf = "initial text2"
-should_speak_hand_detected = True
-speak_patience = 3  # Seconds
-last_hand_detection_time = time.time()
 
 try:
     while True:
@@ -93,37 +68,14 @@ try:
         # Convert frame to RGB (Mediapipe requires RGB input)
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Process the frame with Mediapipe
-        results = hands.process(rgb_frame)
+        if not frame_queue.full():
+            frame_queue.put(rgb_frame)
 
-        if results.multi_hand_landmarks:
-            # Hand detected
-
-            last_hand_detection_time = time.time()
-
-            if should_speak_hand_detected:
-                engine.say("Hand detected")
-                # engine.say("Hand detected. Rub both wrists in rotating manner.")
-                engine.runAndWait()
-                should_speak_hand_detected = False
-
-            if not frame_queue.full():
-                frame_queue.put(rgb_frame)
-
-            if not result_queue.empty():
-                prediction = result_queue.get()
-                predicted_label = np.argmax(prediction)
-                predicted_class = labels_dict[predicted_label]
-                predicted_conf = f"{prediction[predicted_label]:.2f}"
-
-            # Draw hand landmarks on the frame
-            for hand_landmarks in results.multi_hand_landmarks:
-                mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
-        else:
-            # enable speak after `speak_patience` seconds of non-hand detection
-            if time.time() - last_hand_detection_time > speak_patience:
-                should_speak_hand_detected = True
+        if not result_queue.empty():
+            prediction = result_queue.get()
+            predicted_label = np.argmax(prediction)
+            predicted_class = labels_dict[predicted_label]
+            predicted_conf = f"{prediction[predicted_label]:.2f}"
 
         cv2.putText(
             frame,
