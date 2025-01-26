@@ -4,6 +4,8 @@ uploaded_videos/
 models/
 handwash_live/sample_videos
 test.ipynb
+handwash_live/collected_data/
+handwash_live/test.py
 
 
 

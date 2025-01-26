@@ -97,22 +97,23 @@ try:
         # Process the frame with Mediapipe
         results = hands.process(rgb_frame)
 
-        if results.multi_hand_landmarks:
+        if results.multi_hand_landmarks or time.time() - last_hand_detected_time <= SESSION_TIMEOUT:
             # Hand detected
 
-            last_hand_detected_time = time.time()
+            if results.multi_hand_landmarks:
+                last_hand_detected_time = time.time()
 
-            if should_speak:
-                engine.say("Session initiated.")
-                engine.runAndWait()
-                engine.setProperty("rate", 170)
-                engine.say(f"Rub both wrists in rotating manner for {STEP_0_DUR} seconds.")
-                engine.runAndWait()
-                should_speak = False
-                should_speak_great_job = True
-                step_0_start_time = time.time()
-                freq_dict = defaultdict(int)
-                total_frames_processed = 0
+                if should_speak:
+                    engine.say("Session initiated.")
+                    engine.runAndWait()
+                    engine.setProperty("rate", 170)
+                    engine.say(f"Rub both wrists in rotating manner for {STEP_0_DUR} seconds.")
+                    engine.runAndWait()
+                    should_speak = False
+                    should_speak_great_job = True
+                    step_0_start_time = time.time()
+                    freq_dict = defaultdict(int)
+                    total_frames_processed = 0
 
             if not frame_queue.full():
                 frame_queue.put(rgb_frame)
@@ -138,9 +139,10 @@ try:
                 predicted_class = labels_dict[predicted_label]
                 predicted_conf = f"{prediction[predicted_label]:.2f}"
 
-            # Draw hand landmarks on the frame
-            for hand_landmarks in results.multi_hand_landmarks:
-                mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+            if results.multi_hand_landmarks:
+                # Draw hand landmarks on the frame
+                for hand_landmarks in results.multi_hand_landmarks:
+                    mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
         else:
             # enable speak after `SESSION_TIMEOUT` for the next session
