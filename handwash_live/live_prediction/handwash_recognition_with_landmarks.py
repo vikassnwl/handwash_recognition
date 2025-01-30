@@ -7,6 +7,7 @@ import queue
 import pyttsx3
 import time
 from collections import defaultdict
+import sys
 
 
 # Speech Engine
@@ -24,7 +25,7 @@ labels_dict = {
 
 # Load your handwash classification model
 handwash_model = tf.keras.models.load_model(
-    "models/best_model_epoch_010_val_acc_0.9591.keras",
+    "models/best_model_epoch_018_val_acc_0.9558.keras",
     {"preprocess_input": tf.keras.applications.mobilenet_v3.preprocess_input},
 )
 
@@ -53,7 +54,8 @@ hands = mp_hands.Hands(
 mp_draw = mp.solutions.drawing_utils
 
 # Initialize video capture
-cap = cv2.VideoCapture('http://192.168.43.110:4747/video')
+source = sys.argv[1]
+cap = cv2.VideoCapture(source)
 # cap = cv2.VideoCapture('http://192.168.43.135:4747/video')
 # cap = cv2.VideoCapture(0)
 # cap = cv2.VideoCapture("handwash_live/sample_videos/recorded videos/VID_20250117_132117.mp4")
