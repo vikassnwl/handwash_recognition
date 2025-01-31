@@ -4,10 +4,13 @@ uploaded_videos/
 models/
 handwash_live/sample_videos
 test.ipynb
+test.py
 handwash_live/collected_data/
 handwash_live/test.py
 datasets/
 checkpoints/
+dataset/
+tmp/
 
 
 

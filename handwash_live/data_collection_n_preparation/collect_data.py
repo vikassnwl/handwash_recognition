@@ -2,6 +2,7 @@ import mlu_tools.utils as mlutils
 import cv2
 import pyttsx3
 import time
+import os
 import sys
 
 
@@ -13,7 +14,8 @@ def main(source):
         engine.say(text)
         engine.runAndWait()
 
-    collected_data_dir = "handwash_live/collected_data"
+    collected_data_dir = "handwash_live/data_collection_n_preparation/dataset/collected_data"
+    os.makedirs(collected_data_dir, exist_ok=True)
 
     SAVED_VIDEO_DURATION = 5
     RECORDING_DELAY = 5
@@ -57,7 +59,7 @@ def main(source):
     cv2.destroyAllWindows()
 
 
-source = "http://192.168.43.219:4747/video"
+source = int(sys.argv[1]) if sys.argv[1].isdigit() else sys.argv[1]
 if len(sys.argv) > 1 and sys.argv[1] == "testing":
     cap = cv2.VideoCapture(source)
     while True:
